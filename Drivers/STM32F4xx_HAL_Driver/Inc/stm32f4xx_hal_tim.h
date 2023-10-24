@@ -58,16 +58,12 @@ typedef struct
   uint32_t ClockDivision;     /*!< Specifies the clock division.
                                    This parameter can be a value of @ref TIM_ClockDivision */
 
-  uint32_t RepetitionCounter;  /*!< Specifies the repetition counter value. Each time the RCR downcounter
-                                    reaches zero, an update event is generated and counting restarts
-                                    from the RCR value (N).
-                                    This means in PWM mode that (N+1) corresponds to:
-                                        - the number of PWM periods in edge-aligned mode
-                                        - the number of half PWM period in center-aligned mode
-                                     GP timers: this parameter must be a number between Min_Data = 0x00 and
-                                     Max_Data = 0xFF.
-                                     Advanced timers: this parameter must be a number between Min_Data = 0x0000 and
-                                     Max_Data = 0xFFFF. */
+  uint32_t RepetitionCounter;  /*!< 指定重复计数器值。每次RCR下降计数器达到零时，都会生成一个更新事件，
+                                    并从RCR值（N）重新开始计数。这意味着在PWM模式下，（N+1）对应于：
+                                        - 边缘对齐模式下的PWM周期数
+                                        - 中心对准模式下半PWM周期的数量
+                                     GP计时器: 此参数必须是介于Min_Data=0x00和Max_Data=0xFF之间的数字
+                                     高级计时器: 此值必须介于Min_Data=0x000和Max_Data=0xFFFF之间。 */
 
   uint32_t AutoReloadPreload;  /*!< Specifies the auto-reload preload.
                                    This parameter can be a value of @ref TIM_AutoReloadPreload */

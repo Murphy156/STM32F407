@@ -10,6 +10,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "spi.h"
 #include "core_delay.h"
+#include "stm32f4xx_hal_spi.h"
 
 SPI_HandleTypeDef hspi1;
 SPI_HandleTypeDef hspi3;
@@ -232,3 +233,4 @@ uint16_t DRV8303_SPI_ReadWrite(SPI_TypeDef* SPIx, uint16_t TxData)
         return Data;
     }
 }
+

@@ -22,6 +22,8 @@
 #include "stm32f4xx_it.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "bsp_led.h"
+#include "bsp_motor_tim.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -183,5 +185,8 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /* USER CODE BEGIN 1 */
-
+void MOTOR_HALL_TIM_IRQHandler(void)
+{
+    HAL_TIM_IRQHandler(&motor_htimx_hall);
+}
 /* USER CODE END 1 */

@@ -13,8 +13,9 @@
 #include "gpio.h"
 #include "bsp_DRV8303.h"
 #include "bsp_led.h"
+#include "bsp_key.h"
+#include "bsp_bldcm_control.h"
 
-void SystemClock_Config(void);
 //void MX_FREERTOS_Init(void);
 
 
@@ -24,13 +25,125 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
+    __IO uint16_t MOTOR1_ChannelPulse = MOTOR1_PWM_MAX_PERIOD_COUNT/10;
+    __IO uint16_t MOTOR2_ChannelPulse = MOTOR2_PWM_MAX_PERIOD_COUNT/10;
+
+    uint8_t i = 0;
+    uint8_t j = 0;
+
+    uint8_t motor1_en_flag = 0;
+    uint8_t motor2_en_flag = 0;
     HAL_Init();
-
+    /** 初始化系统时钟为168MHz */
     SystemClock_Config();
-
+    /** LED 灯初始化 */
     LED_GPIO_Config();
-
+    /** 初始化 DRV8303 */
     DRV8303_Init();
+    /** 初始化按键G PIO */
+    Key_GPIO_Config();
+    /** 初始化电机 */
+    bldcm_init();
+
+    while (1)
+    {
+        /** 扫描KEY1 */
+        if(Key_Scan(KEY1_GPIO_PORT, KEY1_PIN) == KEY_ON)
+        {
+//            __HAL_TIM_SET_COMPARE(&motor1_htimx_bldcm, TIM_CHANNEL_2, 0);                       /** 通道 2 配置为 0 */
+//            HAL_GPIO_WritePin(MOTOR1_OCNPWM2_GPIO_PORT, MOTOR1_OCNPWM2_PIN, GPIO_PIN_RESET);    /** 关闭下桥臂 */
+//
+//            __HAL_TIM_SET_COMPARE(&motor1_htimx_bldcm, TIM_CHANNEL_3, 0);                       /** 通道 3 配置为 0 */
+//            HAL_GPIO_WritePin(MOTOR1_OCNPWM1_GPIO_PORT, MOTOR1_OCNPWM1_PIN, GPIO_PIN_RESET);    /** 关闭下桥臂 */
+//
+//            __HAL_TIM_SET_COMPARE(&motor1_htimx_bldcm, TIM_CHANNEL_1, 550);      /** 通道 1 配置的占空比 */
+//            HAL_GPIO_WritePin(MOTOR1_OCNPWM3_GPIO_PORT, MOTOR1_OCNPWM3_PIN, GPIO_PIN_SET);      /** 开启下桥臂 */
+
+            LED1_ON;
+            /** 使能电机 */
+            if(!motor1_en_flag)
+            {
+                set_motor1_bldcm_speed(MOTOR1_ChannelPulse);
+                set_motor1_bldcm_enable();
+            }
+            else
+            {
+                set_motor1_bldcm_disable();
+            }
+            motor1_en_flag = !motor1_en_flag;
+        }
+        /** 扫描KEY2 */
+        if(Key_Scan(KEY2_GPIO_PORT, KEY2_PIN) == KEY_ON)
+        {
+//            __HAL_TIM_SET_COMPARE(&motor1_htimx_bldcm, TIM_CHANNEL_3, 0);                       /** 通道 3 配置为 0 */
+//            HAL_GPIO_WritePin(MOTOR1_OCNPWM3_GPIO_PORT, MOTOR1_OCNPWM3_PIN, GPIO_PIN_RESET);    /** 关闭下桥臂 */
+//
+//            __HAL_TIM_SET_COMPARE(&motor1_htimx_bldcm, TIM_CHANNEL_1, 0);                       /** 通道 1 配置为 0 */
+//            HAL_GPIO_WritePin(MOTOR1_OCNPWM2_GPIO_PORT, MOTOR1_OCNPWM2_PIN, GPIO_PIN_RESET);    /** 关闭下桥臂 */
+//
+//            __HAL_TIM_SET_COMPARE(&motor1_htimx_bldcm, TIM_CHANNEL_2, 550);      /** 通道 2 配置的占空比 */
+//            HAL_GPIO_WritePin(MOTOR1_OCNPWM1_GPIO_PORT, MOTOR1_OCNPWM1_PIN, GPIO_PIN_SET);      /** 开启下桥臂 */
+
+            LED2_ON;
+            /** 使能电机 */
+            if(!motor2_en_flag)
+            {
+                set_motor2_bldcm_speed(MOTOR2_ChannelPulse);
+                set_motor2_bldcm_enable();
+            }
+            else
+            {
+                set_motor2_bldcm_disable();
+            }
+            motor2_en_flag = !motor2_en_flag;
+        }
+        /** 扫描KEY3 */
+        if(Key_Scan(KEY3_GPIO_PORT, KEY3_PIN) == KEY_ON)
+        {
+            LED3_ON;
+            /** 增大占空比 */
+            MOTOR1_ChannelPulse += 200;
+
+            if(MOTOR1_ChannelPulse > MOTOR1_PWM_MAX_PERIOD_COUNT)
+                MOTOR1_ChannelPulse = MOTOR1_PWM_MAX_PERIOD_COUNT;
+
+            set_motor1_bldcm_speed(MOTOR1_ChannelPulse);
+
+            MOTOR2_ChannelPulse += MOTOR2_PWM_MAX_PERIOD_COUNT/10;
+
+            if(MOTOR2_ChannelPulse > MOTOR2_PWM_MAX_PERIOD_COUNT)
+                MOTOR2_ChannelPulse = MOTOR2_PWM_MAX_PERIOD_COUNT;
+
+            set_motor2_bldcm_speed(MOTOR2_ChannelPulse);
+        }
+        /** 扫描KEY4 */
+        if(Key_Scan(KEY4_GPIO_PORT, KEY4_PIN) == KEY_ON)
+        {
+            LED4_ON;
+            /** 减少占空比 */
+            if(MOTOR1_ChannelPulse < MOTOR1_PWM_MAX_PERIOD_COUNT/10)
+                MOTOR1_ChannelPulse = 0;
+            else
+                MOTOR1_ChannelPulse -= MOTOR1_PWM_MAX_PERIOD_COUNT/10;
+
+            set_motor1_bldcm_speed(MOTOR1_ChannelPulse);
+
+            if(MOTOR2_ChannelPulse < MOTOR2_PWM_MAX_PERIOD_COUNT/10)
+                MOTOR2_ChannelPulse = 0;
+            else
+                MOTOR2_ChannelPulse -= MOTOR2_PWM_MAX_PERIOD_COUNT/10;
+
+            set_motor2_bldcm_speed(MOTOR2_ChannelPulse);
+        }
+        /** 扫描KEY5 */
+        if(Key_Scan(KEY5_GPIO_PORT,KEY5_PIN) == KEY_ON)
+        {
+            /** 转换方向 */
+            set_motor1_bldcm_direction( (++i % 2) ? MOTOR_FWD : MOTOR_REV);
+
+            set_motor2_bldcm_direction( (++j % 2) ? MOTOR_FWD : MOTOR_REV);
+        }
+    }
 }
 
 
@@ -56,8 +169,8 @@ int main(void)
   */
 void SystemClock_Config(void)
 {
-    RCC_ClkInitTypeDef RCC_ClkInitStruct;
-    RCC_OscInitTypeDef RCC_OscInitStruct;
+    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 
     /* Enable Power Control clock */
     __HAL_RCC_PWR_CLK_ENABLE();
@@ -75,22 +188,22 @@ void SystemClock_Config(void)
     RCC_OscInitStruct.PLL.PLLM = 8;
     RCC_OscInitStruct.PLL.PLLN = 336;
     RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-    RCC_OscInitStruct.PLL.PLLQ = 7;
-    if(HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+    RCC_OscInitStruct.PLL.PLLQ = 4;
+    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
     {
-        while(1) {};
+        Error_Handler();
     }
 
-    /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2
-       clocks dividers */
+    /** Initializes the CPU, AHB and APB buses clocks */
     RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
     RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
     RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
     RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
-    if(HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
+
+    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
     {
-        while(1) {};
+        Error_Handler();
     }
 
     /* STM32F405x/407x/415x/417x Revision Z devices: prefetch is supported  */
@@ -99,6 +212,21 @@ void SystemClock_Config(void)
         /* Enable the Flash prefetch */
         __HAL_FLASH_PREFETCH_BUFFER_ENABLE();
     }
+}
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+void Error_Handler(void)
+{
+    /* USER CODE BEGIN Error_Handler_Debug */
+    /* User can add his own implementation to report the HAL error return state */
+    __disable_irq();
+    while (1)
+    {
+    }
+    /* USER CODE END Error_Handler_Debug */
 }
 /****************************END OF FILE***************************/
 

@@ -67,9 +67,7 @@ void DRV8303_EN_GATE2_HIGH(void)
   */
 void DRV8303_WriteWord(uint16_t TxData1,uint16_t TxData2)
 {
-
     uint16_t Control_Reg = 0;
-
     SPI_WRITE_MODE1=TxData1;
     Control_Reg=(TxData1 & 0x7800)>>11;
     if(Control_Reg == 0x0002)
@@ -131,7 +129,6 @@ void DRV8303_Init(void)
 
     /** 用来读控制寄存器2的值 */
     ReadReg=DRV8303_Read_Mode|DRV8303_Control_Reg2;
-
     uint16_t Re_values3 = DRV8303_SPI_ReadWrite(DRV8303_SPI1, ReadReg);
     if(0x1808 == Re_values3)
     {
