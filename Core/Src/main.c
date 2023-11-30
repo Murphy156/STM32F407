@@ -109,7 +109,7 @@ int main(void)
 
             set_motor1_bldcm_speed(MOTOR1_ChannelPulse);
 
-            MOTOR2_ChannelPulse += MOTOR2_PWM_MAX_PERIOD_COUNT/10;
+            MOTOR2_ChannelPulse += 350;
 
             if(MOTOR2_ChannelPulse > MOTOR2_PWM_MAX_PERIOD_COUNT)
                 MOTOR2_ChannelPulse = MOTOR2_PWM_MAX_PERIOD_COUNT;
@@ -124,7 +124,7 @@ int main(void)
             if(MOTOR1_ChannelPulse < MOTOR1_PWM_MAX_PERIOD_COUNT/10)
                 MOTOR1_ChannelPulse = 0;
             else
-                MOTOR1_ChannelPulse -= MOTOR1_PWM_MAX_PERIOD_COUNT/10;
+                MOTOR1_ChannelPulse -= 350;
 
             set_motor1_bldcm_speed(MOTOR1_ChannelPulse);
 
