@@ -22,8 +22,15 @@
 #include "stm32f4xx_it.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "stm32f4xx.h"
+#include "stm32f4xx_hal.h"
+
+/** USER CODE BEGIN 0 */
 #include "bsp_led.h"
 #include "bsp_motor_tim.h"
+#include "bsp_usart.h"
+/** USER CODE END 0 */
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -190,3 +197,19 @@ void MOTOR_HALL_TIM_IRQHandler(void)
     HAL_TIM_IRQHandler(&motor_htimx_hall);
 }
 /* USER CODE END 1 */
+
+/* USER CODE BEGIN 2 */
+void USART_IRQHandler(void)
+{
+    uint8_t data[1];
+
+    if(__HAL_UART_GET_IT_SOURCE(&UartHandle, UART_IT_RXNE) != RESET)
+    {
+        data[0] = UartHandle.Instance->RDR;
+        PushArr(data_buff,data[0]);
+        __HAL_UART_CLEAR_FLAG(&UartHandle, UART_IT_RXNE);
+    }
+    HAL_UART_IRQHandler(&UartHandle);
+    __HAL_UART_ENABLE_IT(&UartHandle,UART_IT_RXNE);
+}
+/* USER CODE END 2 */
