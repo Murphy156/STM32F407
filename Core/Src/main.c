@@ -15,6 +15,7 @@
 #include "bsp_led.h"
 #include "bsp_key.h"
 #include "bsp_bldcm_control.h"
+#include "bsp_usart.h"
 
 //void MX_FREERTOS_Init(void);
 
@@ -43,106 +44,93 @@ int main(void)
     /** 初始化按键G PIO */
     Key_GPIO_Config();
     /** 初始化电机 */
-    bldcm_init();
+//    bldcm_init();
+    /** 初始化USART 配置模式为 115200 8-N-1，中断接收 */
+    USART_Config();
 
     while (1)
     {
-        /** 扫描KEY1 */
-        if(Key_Scan(KEY1_GPIO_PORT, KEY1_PIN) == KEY_ON)
-        {
-//            __HAL_TIM_SET_COMPARE(&motor1_htimx_bldcm, TIM_CHANNEL_2, 0);                       /** 通道 2 配置为 0 */
-//            HAL_GPIO_WritePin(MOTOR1_OCNPWM2_GPIO_PORT, MOTOR1_OCNPWM2_PIN, GPIO_PIN_RESET);    /** 关闭下桥臂 */
+        receiving_process();
+//        /** 扫描KEY1 */
+//        if(Key_Scan(KEY1_GPIO_PORT, KEY1_PIN) == KEY_ON)
+//        {
+//            LED1_TOGGLE;
+//            /** 使能电机 */
+//            if(!motor1_en_flag)
+//            {
+//                set_motor1_bldcm_speed(MOTOR1_ChannelPulse);
+//                set_motor1_bldcm_enable();
+//            }
+//            else
+//            {
+//                set_motor1_bldcm_disable();
+//            }
+//            motor1_en_flag = !motor1_en_flag;
+//        }
+//        /** 扫描KEY2 */
+//        if(Key_Scan(KEY2_GPIO_PORT, KEY2_PIN) == KEY_ON)
+//        {
+//            LED2_TOGGLE;
+//            /** 使能电机 */
+//            if(!motor2_en_flag)
+//            {
+//                set_motor2_bldcm_speed(MOTOR2_ChannelPulse);
+//                set_motor2_bldcm_enable();
+//            }
+//            else
+//            {
+//                set_motor2_bldcm_disable();
+//            }
+//            motor2_en_flag = !motor2_en_flag;
+//        }
+//        /** 扫描KEY3 */
+//        if(Key_Scan(KEY3_GPIO_PORT, KEY3_PIN) == KEY_ON)
+//        {
+//            LED3_TOGGLE;
+//            /** 增大占空比 */
+//            MOTOR1_ChannelPulse += 200;
 //
-//            __HAL_TIM_SET_COMPARE(&motor1_htimx_bldcm, TIM_CHANNEL_3, 0);                       /** 通道 3 配置为 0 */
-//            HAL_GPIO_WritePin(MOTOR1_OCNPWM1_GPIO_PORT, MOTOR1_OCNPWM1_PIN, GPIO_PIN_RESET);    /** 关闭下桥臂 */
+//            if(MOTOR1_ChannelPulse > MOTOR1_PWM_MAX_PERIOD_COUNT)
+//                MOTOR1_ChannelPulse = MOTOR1_PWM_MAX_PERIOD_COUNT;
 //
-//            __HAL_TIM_SET_COMPARE(&motor1_htimx_bldcm, TIM_CHANNEL_1, 550);      /** 通道 1 配置的占空比 */
-//            HAL_GPIO_WritePin(MOTOR1_OCNPWM3_GPIO_PORT, MOTOR1_OCNPWM3_PIN, GPIO_PIN_SET);      /** 开启下桥臂 */
-
-            LED1_ON;
-            /** 使能电机 */
-            if(!motor1_en_flag)
-            {
-                set_motor1_bldcm_speed(MOTOR1_ChannelPulse);
-                set_motor1_bldcm_enable();
-            }
-            else
-            {
-                set_motor1_bldcm_disable();
-            }
-            motor1_en_flag = !motor1_en_flag;
-        }
-        /** 扫描KEY2 */
-        if(Key_Scan(KEY2_GPIO_PORT, KEY2_PIN) == KEY_ON)
-        {
-//            __HAL_TIM_SET_COMPARE(&motor1_htimx_bldcm, TIM_CHANNEL_3, 0);                       /** 通道 3 配置为 0 */
-//            HAL_GPIO_WritePin(MOTOR1_OCNPWM3_GPIO_PORT, MOTOR1_OCNPWM3_PIN, GPIO_PIN_RESET);    /** 关闭下桥臂 */
+//            set_motor1_bldcm_speed(MOTOR1_ChannelPulse);
 //
-//            __HAL_TIM_SET_COMPARE(&motor1_htimx_bldcm, TIM_CHANNEL_1, 0);                       /** 通道 1 配置为 0 */
-//            HAL_GPIO_WritePin(MOTOR1_OCNPWM2_GPIO_PORT, MOTOR1_OCNPWM2_PIN, GPIO_PIN_RESET);    /** 关闭下桥臂 */
+//            MOTOR2_ChannelPulse += 350;
 //
-//            __HAL_TIM_SET_COMPARE(&motor1_htimx_bldcm, TIM_CHANNEL_2, 550);      /** 通道 2 配置的占空比 */
-//            HAL_GPIO_WritePin(MOTOR1_OCNPWM1_GPIO_PORT, MOTOR1_OCNPWM1_PIN, GPIO_PIN_SET);      /** 开启下桥臂 */
-
-            LED2_ON;
-            /** 使能电机 */
-            if(!motor2_en_flag)
-            {
-                set_motor2_bldcm_speed(MOTOR2_ChannelPulse);
-                set_motor2_bldcm_enable();
-            }
-            else
-            {
-                set_motor2_bldcm_disable();
-            }
-            motor2_en_flag = !motor2_en_flag;
-        }
-        /** 扫描KEY3 */
-        if(Key_Scan(KEY3_GPIO_PORT, KEY3_PIN) == KEY_ON)
-        {
-            LED3_ON;
-            /** 增大占空比 */
-            MOTOR1_ChannelPulse += 200;
-
-            if(MOTOR1_ChannelPulse > MOTOR1_PWM_MAX_PERIOD_COUNT)
-                MOTOR1_ChannelPulse = MOTOR1_PWM_MAX_PERIOD_COUNT;
-
-            set_motor1_bldcm_speed(MOTOR1_ChannelPulse);
-
-            MOTOR2_ChannelPulse += 350;
-
-            if(MOTOR2_ChannelPulse > MOTOR2_PWM_MAX_PERIOD_COUNT)
-                MOTOR2_ChannelPulse = MOTOR2_PWM_MAX_PERIOD_COUNT;
-
-            set_motor2_bldcm_speed(MOTOR2_ChannelPulse);
-        }
-        /** 扫描KEY4 */
-        if(Key_Scan(KEY4_GPIO_PORT, KEY4_PIN) == KEY_ON)
-        {
-            LED4_ON;
-            /** 减少占空比 */
-            if(MOTOR1_ChannelPulse < MOTOR1_PWM_MAX_PERIOD_COUNT/10)
-                MOTOR1_ChannelPulse = 0;
-            else
-                MOTOR1_ChannelPulse -= 350;
-
-            set_motor1_bldcm_speed(MOTOR1_ChannelPulse);
-
-            if(MOTOR2_ChannelPulse < MOTOR2_PWM_MAX_PERIOD_COUNT/10)
-                MOTOR2_ChannelPulse = 0;
-            else
-                MOTOR2_ChannelPulse -= MOTOR2_PWM_MAX_PERIOD_COUNT/10;
-
-            set_motor2_bldcm_speed(MOTOR2_ChannelPulse);
-        }
-        /** 扫描KEY5 */
-        if(Key_Scan(KEY5_GPIO_PORT,KEY5_PIN) == KEY_ON)
-        {
-            /** 转换方向 */
-            set_motor1_bldcm_direction( (++i % 2) ? MOTOR_FWD : MOTOR_REV);
-
-            set_motor2_bldcm_direction( (++j % 2) ? MOTOR_FWD : MOTOR_REV);
-        }
+//            if(MOTOR2_ChannelPulse > MOTOR2_PWM_MAX_PERIOD_COUNT)
+//                MOTOR2_ChannelPulse = MOTOR2_PWM_MAX_PERIOD_COUNT;
+//
+//            set_motor2_bldcm_speed(MOTOR2_ChannelPulse);
+//        }
+//        /** 扫描KEY4 */
+//        if(Key_Scan(KEY4_GPIO_PORT, KEY4_PIN) == KEY_ON)
+//        {
+//            LED4_TOGGLE;
+//            /** 减少占空比 */
+//            if(MOTOR1_ChannelPulse < MOTOR1_PWM_MAX_PERIOD_COUNT/10)
+//                MOTOR1_ChannelPulse = 0;
+//            else
+//                MOTOR1_ChannelPulse -= 350;
+//
+//            set_motor1_bldcm_speed(MOTOR1_ChannelPulse);
+//
+//            if(MOTOR2_ChannelPulse < MOTOR2_PWM_MAX_PERIOD_COUNT/10)
+//                MOTOR2_ChannelPulse = 0;
+//            else
+//                MOTOR2_ChannelPulse -= MOTOR2_PWM_MAX_PERIOD_COUNT/10;
+//
+//            set_motor2_bldcm_speed(MOTOR2_ChannelPulse);
+//        }
+//        /** 扫描KEY5 */
+//        if(Key_Scan(KEY5_GPIO_PORT,KEY5_PIN) == KEY_ON)
+//        {
+//            LED1_TOGGLE;
+//            LED2_TOGGLE;
+//            /** 转换方向 */
+//            set_motor1_bldcm_direction( (++i % 2) ? MOTOR_FWD : MOTOR_REV);
+//
+//            set_motor2_bldcm_direction( (++j % 2) ? MOTOR_FWD : MOTOR_REV);
+//        }
     }
 }
 

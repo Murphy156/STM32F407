@@ -203,9 +203,11 @@ void USART_IRQHandler(void)
 {
     uint8_t data[1];
 
+    data[0] = __HAL_UART_FLUSH_DRREGISTER(&UartHandle);
+//    data[0] = UartHandle.Instance->DR;
     if(__HAL_UART_GET_IT_SOURCE(&UartHandle, UART_IT_RXNE) != RESET)
     {
-        data[0] = UartHandle.Instance->RDR;
+        data[0] = UartHandle.Instance->DR;
         PushArr(data_buff,data[0]);
         __HAL_UART_CLEAR_FLAG(&UartHandle, UART_IT_RXNE);
     }

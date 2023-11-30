@@ -13,12 +13,12 @@
 #define USART_CLK_ENABLE()				__USART1_CLK_ENABLE();
 
 #define USART_RX_GPIO_PORT              GPIOB
-#define USART_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOB_CLK_ENABLE()
+#define USART_RX_GPIO_CLK_ENABLE()      __GPIOB_CLK_ENABLE()
 #define USART_RX_PIN                    GPIO_PIN_6
 #define USART_RX_AF                     GPIO_AF7_USART1
 
 #define USART_TX_GPIO_PORT              GPIOB
-#define USART_TX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOB_CLK_ENABLE()
+#define USART_TX_GPIO_CLK_ENABLE()      __GPIOB_CLK_ENABLE()
 #define USART_TX_PIN                    GPIO_PIN_7
 #define USART_TX_AF                     GPIO_AF7_USART1
 
@@ -52,6 +52,19 @@
 #define CMD_NONE             	        0xFF            /** 空指令 */
 
 extern UART_HandleTypeDef UartHandle;
+extern uint8_t	data_buff[max_length];
 
+void USART_Config(void);
+uint8_t PushArr(uint8_t *arr,uint8_t data);
+uint8_t PopArr(uint8_t *arr ,uint8_t *data);
+uint8_t calculateChecksum(unsigned char *data);
+
+int8_t receiving_process(void);
+uint16_t calculateCRC16(uint8_t* arr, int length);
+static uint8_t recvBuff_Find_Header(void);
+uint16_t mergeBytesToUint16(uint8_t data[2]);
+uint64_t mergeParametersToUint64(void);
+static uint8_t protocol_Check_header_CRC(void);
+void set_computer_Speed_Location_value(uint8_t cmd, int32_t data);
 
 #endif //CPROJECT_BSP_USART_H

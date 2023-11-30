@@ -48,6 +48,7 @@ void USART_Config(void)
     HAL_UART_Init(&UartHandle);						/** 只是开启了USART_UE */
     /** 配置串口接收中断 */
     __HAL_UART_ENABLE_IT(&UartHandle,UART_IT_RXNE);
+
     HAL_NVIC_SetPriority(USART_IRQ, 0, 2);
     HAL_NVIC_EnableIRQ(USART_IRQ);
 }
